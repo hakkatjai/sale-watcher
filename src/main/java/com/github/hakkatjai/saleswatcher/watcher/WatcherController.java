@@ -5,7 +5,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
-@RestController(WatcherController.WATCHER)
+@RequestMapping(WatcherController.WATCHER)
+@RestController
 public class WatcherController {
 
     public static final String WATCHER = "watcher";

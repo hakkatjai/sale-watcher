@@ -4,12 +4,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+@Configuration
 @EnableScheduling
 public class WatcherScheduler {
 
@@ -20,7 +21,7 @@ public class WatcherScheduler {
         this.watcherRepository = watcherRepository;
     }
 
-    @Scheduled(cron = "* * * * *")
+    @Scheduled(cron = "* /30 * * * *")
     public void watch() {
         watcherRepository.findAll().forEach(record -> {
             Watcher watcherFromDb = watcherRepository.findById(record.getId()).orElse(null);
