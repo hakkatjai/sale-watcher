@@ -21,7 +21,7 @@ public class WatcherScheduler {
         this.watcherRepository = watcherRepository;
     }
 
-    @Scheduled(cron = "* /30 * * * *")
+    @Scheduled(cron = "* 0/30 * * * *")
     public void watch() {
         watcherRepository.findAll().forEach(record -> {
             Watcher watcherFromDb = watcherRepository.findById(record.getId()).orElse(null);
