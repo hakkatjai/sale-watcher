@@ -4,7 +4,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -14,6 +17,9 @@ import java.io.IOException;
 @EnableScheduling
 public class WatcherScheduler {
 
+    @Autowired
+    private JavaMailSender emailSender;
+
     private static final String NON_NUMERIC_REGEX = "[^\\d.]";
     private WatcherRepository watcherRepository;
 
@@ -21,7 +27,7 @@ public class WatcherScheduler {
         this.watcherRepository = watcherRepository;
     }
 
-    @Scheduled(cron = "0 0/30 * * * *")
+    @Scheduled(cron = "0 0/5 * * * *")
     public void watch() {
         watcherRepository.findAll().forEach(record -> {
             Watcher watcherFromDb = watcherRepository.findById(record.getId()).orElse(null);
@@ -54,10 +60,20 @@ public class WatcherScheduler {
                         System.out.println("Initialized user entry with prices from internet");
                     } else if (watcherFromInternet.isCheaperThan(watcherFromDb)) {
                         watcherRepository.save(watcherFromInternet);
-                        System.out.println("send notification");
+                        SimpleMailMessage mail = new SimpleMailMessage();
+                        mail.setTo("jpk.liu@gmail.com");
+                        mail.setFrom("jpk.liu@ziggo.nl");
+                        mail.setSubject("SALE " + watcherFromInternet.getName() + ": " + watcherFromInternet.getDescription());
+                        StringBuilder message = new StringBuilder();
+                        message.append(watcherFromInternet.getFormerPrice() + " -> " + watcherFromInternet.getCurrentPrice());
+                        message.append(System.getProperty("line.separator"));
+                        message.append(System.getProperty("line.separator"));
+                        message.append(watcherFromInternet.getUrl());
+                        mail.setText(message.toString());
+                        emailSender.send(mail);
+                        System.out.println("notification send");
                     } else {
                         System.out.println("no sale yet");
-
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

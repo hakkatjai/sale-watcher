@@ -2,9 +2,6 @@ package com.github.hakkatjai.saleswatcher.watcher;
 
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class WatcherService {
 
@@ -22,4 +19,15 @@ public class WatcherService {
         return watcherRepository.save(watcher);
     }
 
+    public void update(Watcher watcher) {
+        Watcher persistedWatcher = watcherRepository.findById(watcher.getId()).orElse(null);
+        if (persistedWatcher != null) {
+            // TODO JL map watcher values to persistedWatcher values
+            watcherRepository.save(persistedWatcher);
+        }
+    }
+
+    public void delete(Long id) {
+        watcherRepository.deleteById(id);
+    }
 }

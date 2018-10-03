@@ -29,4 +29,16 @@ public class WatcherController {
         return ResponseEntity.created(uri).build();
     }
 
+    @PutMapping
+    public ResponseEntity put(@RequestBody Watcher watcher) {
+        watcherService.update(watcher);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping(value = "{id}")
+    public ResponseEntity delete(@PathVariable Long id) {
+        watcherService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
